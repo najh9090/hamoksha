@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HAMOKSHA - Learn with a curious cat</title>
+  <meta name="description" content="HAMOKSHA is a bilingual (English and Arabic) educational AI platform with subject chats, teacher monitoring and live classes.">
+  <meta name="theme-color" content="#e8883a">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="configBanner" class="banner" hidden data-i18n="configMissing"></div>
+
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="HAMOKSHA home">
+      <img src="assets/logo.svg" alt="" width="36" height="36">
+      <span>HAMOKSHA</span>
+    </a>
+    <div class="top-actions">
+      <button id="langToggle" class="btn btn-ghost btn-sm" type="button" data-i18n-title="language">عربي</button>
+      <div id="userBox" class="user-box" hidden>
+        <div class="user-text">
+          <strong id="userName"></strong>
+          <span id="userRole" class="muted"></span>
+        </div>
+        <button id="logoutBtn" class="btn btn-ghost btn-sm" type="button" data-i18n="logout">Log out</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ AUTH ============ -->
+  <main id="authView" class="auth">
+    <section class="hero">
+      <img class="hero-cat" src="assets/logo.svg" alt="" width="132" height="132">
+      <h1>HAMOKSHA</h1>
+      <p class="tagline" data-i18n="tagline">Learn smarter. A curious cat is on your side.</p>
+      <p class="muted" data-i18n="heroText"></p>
+    </section>
+
+    <section class="card ears">
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" data-auth-tab="login" aria-selected="true" data-i18n="login">Log in</button>
+        <button type="button" role="tab" data-auth-tab="signup" aria-selected="false" data-i18n="signup">Sign up</button>
+      </div>
+
+      <form id="authForm" class="form" autocomplete="on">
+        <label class="signup-only" hidden>
+          <span data-i18n="name">Your name</span>
+          <input name="name" id="name" type="text" maxlength="60" autocomplete="name">
+        </label>
+        <label>
+          <span data-i18n="email">Email</span>
+          <input name="email" id="email" type="email" required autocomplete="email" dir="ltr">
+        </label>
+        <label>
+          <span data-i18n="password">Password</span>
+          <input name="password" id="password" type="password" required minlength="6" autocomplete="current-password" dir="ltr">
+        </label>
+
+        <fieldset class="signup-only role-pick" hidden>
+          <legend data-i18n="iAm">I am a</legend>
+          <label class="chip"><input type="radio" name="role" value="student" checked><span data-i18n="student">Student</span></label>
+          <label class="chip"><input type="radio" name="role" value="teacher"><span data-i18n="teacher">Teacher</span></label>
+        </fieldset>
+
+        <label id="teacherCodeRow" hidden>
+          <span data-i18n="teacherCode">Teacher code</span>
+          <input name="teacherCode" type="text" autocomplete="off" dir="ltr">
+        </label>
+
+        <button id="authSubmit" class="btn btn-primary btn-block" type="submit">Log in</button>
+      </form>
+    </section>
+  </main>
+
+  <!-- ============ APP ============ -->
+  <div id="appView" class="app" hidden>
+    <aside class="sidebar">
+      <nav id="nav" aria-label="Main">
+        <p class="nav-title" data-i18n="subjects">Subjects</p>
+        <button type="button" data-view="general"><span class="dot"></span><span data-i18n="general">General chat</span></button>
+        <button type="button" data-view="math"><span class="dot"></span><span data-i18n="math">Mathematics</span></button>
+        <button type="button" data-view="languages"><span class="dot"></span><span data-i18n="languages">Languages</span></button>
+        <button type="button" data-view="programming"><span class="dot"></span><span data-i18n="programming">Programming</span></button>
+        <button type="button" data-view="science"><span class="dot"></span><span data-i18n="science">Science</span></button>
+        <p class="nav-title" data-i18n="liveClasses">Live classes</p>
+        <button type="button" data-view="classes"><span class="dot"></span><span data-i18n="liveClasses">Live classes</span></button>
+        <button type="button" id="navTeacher" data-view="teacher" hidden><span class="dot"></span><span data-i18n="teacherDashboard">Teacher dashboard</span></button>
+      </nav>
+
+      <div id="history" class="history" hidden>
+        <div class="history-head">
+          <p class="nav-title" data-i18n="recent">Recent chats</p>
+          <button id="newChatBtn" class="btn btn-ghost btn-sm" type="button" data-i18n="newChat">New chat</button>
+        </div>
+        <ul id="historyList"></ul>
+      </div>
+    </aside>
+
+    <main class="main">
+      <h2 id="stageTitle" class="stage-title"></h2>
+      <div id="stage" class="stage"></div>
+    </main>
+  </div>
+
+  <!-- ============ CLASSROOM ============ -->
+  <div id="meetingOverlay" class="meeting" hidden role="dialog" aria-modal="true" aria-labelledby="meetingTitle">
+    <div class="meeting-bar">
+      <strong id="meetingTitle"></strong>
+    </div>
+    <p id="meetingStatus" class="meeting-status" hidden></p>
+    <div id="videoGrid" class="video-grid" data-count="0"></div>
+    <div class="meeting-controls">
+      <button id="btnMic" class="btn btn-ghost" type="button" aria-pressed="true" data-i18n="mic">Mic</button>
+      <button id="btnCam" class="btn btn-ghost" type="button" aria-pressed="true" data-i18n="cam">Camera</button>
+      <button id="btnLeave" class="btn btn-danger" type="button" data-i18n="leave">Leave</button>
+    </div>
+  </div>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

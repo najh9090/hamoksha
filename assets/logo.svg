@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="HAMOKSHA cat">
+  <path d="M9 30 L11 5 L27 16 Z" fill="#E8883A"/>
+  <path d="M55 30 L53 5 L37 16 Z" fill="#E8883A"/>
+  <path d="M14 24 L15 12 L23 17 Z" fill="#F3B6B0"/>
+  <path d="M50 24 L49 12 L41 17 Z" fill="#F3B6B0"/>
+  <ellipse cx="32" cy="38" rx="23" ry="21" fill="#E8883A"/>
+  <path d="M32 18 V25 M25.5 19.5 L27.5 25.5 M38.5 19.5 L36.5 25.5" stroke="#B9611A" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+  <ellipse cx="22.5" cy="36" rx="4.6" ry="5" fill="#6FA85B"/>
+  <ellipse cx="41.5" cy="36" rx="4.6" ry="5" fill="#6FA85B"/>
+  <ellipse cx="22.5" cy="36" rx="1.4" ry="4" fill="#2B2118"/>
+  <ellipse cx="41.5" cy="36" rx="1.4" ry="4" fill="#2B2118"/>
+  <path d="M29.5 43 H34.5 L32 46 Z" fill="#E58C86"/>
+  <path d="M32 46 V48.5 M32 48.5 Q29 51.5 26 49.5 M32 48.5 Q35 51.5 38 49.5" stroke="#2B2118" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M15 44 L6 42 M15 47 L6 49 M49 44 L58 42 M49 47 L58 49" stroke="#2B2118" stroke-width="1.2" stroke-linecap="round" opacity=".55"/>
+</svg>
