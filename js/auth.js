@@ -13,7 +13,10 @@ export async function signUp({ email, password, name, role, teacherCode }) {
     },
   });
   if (error) throw error;
-  return data; // data.session is null when email confirmation is enabled
+  if (data.session) return data;
+  // No session returned (Supabase still has "Confirm email" on, or the email
+  // already exists). Email confirmation is not used, so log straight in.
+  return signIn({ email, password });
 }
 
 export async function signIn({ email, password }) {
@@ -30,7 +33,11 @@ export async function getSessionUser() {
 }
 
 export async function getProfile(userId) {
-  const { data, error } = await sb.from('profiles').select('*').eq('id', userId).single();
+  const { data, error } = await sb.from('profiles').select('*').eq('id', userId).maybeSingle();
   if (error) throw error;
-  return data;
+  if (data) return data;
+  // Accounts created before the schema was installed have no profile row.
+  const { data: created, error: rpcError } = await sb.rpc('ensure_profile');
+  if (rpcError) throw rpcError;
+  return created;
 }

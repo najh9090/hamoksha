@@ -25,7 +25,7 @@ supabase/schema.sql tables, RLS policies, realtime
    export const SUPABASE_URL = 'https://xxxx.supabase.co';
    export const SUPABASE_ANON_KEY = 'eyJ...';
    ```
-4. Authentication > Providers: keep Email enabled. For quick testing you can turn off "Confirm email".
+4. Authentication > Sign In / Providers > Email: keep Email enabled and turn **off** "Confirm email". The app does not use email confirmation (the schema also auto-confirms every new account and confirms existing ones).
 5. Optional: stop anyone from registering as a teacher by setting a secret code, then share it with real teachers:
    ```sql
    update public.app_config set value = 'choose-a-secret-code' where key = 'teacher_code';

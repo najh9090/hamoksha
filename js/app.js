@@ -26,8 +26,8 @@ async function enterApp(user) {
   try {
     state.profile = await auth.getProfile(user.id);
   } catch (err) {
-    console.error(err);
-    toast(t('error'), 'error');
+    console.error('Profile load failed:', err);
+    toast(`${t('error')} (${err.message || 'profile'})`, 'error');
     await auth.signOut();
     return showAuth();
   }
@@ -137,6 +137,18 @@ async function newChat() {
   }
 }
 
+function authErrorMessage(err, mode, role) {
+  const m = String(err && err.message || '');
+  const code = err && err.code;
+  if (/database error/i.test(m) && mode === 'signup' && role === 'teacher') return t('badCode');
+  if (code === 'email_not_confirmed' || /email not confirmed/i.test(m)) return t('emailNotConfirmed');
+  if (code === 'invalid_credentials' || /invalid login credentials/i.test(m)) return t('badLogin');
+  if (code === 'user_already_exists' || /already registered/i.test(m)) return t('alreadyRegistered');
+  if (code === 'weak_password' || /at least 6/i.test(m)) return t('weakPassword');
+  if (err && err.status === 429 || /rate limit/i.test(m)) return t('rateLimited');
+  return m || t('error');
+}
+
 // ------------------------------------------------------------------
 // Auth form wiring
 // ------------------------------------------------------------------
@@ -178,11 +190,6 @@ function bindAuth() {
           role: v.role.value,
           teacherCode: v.teacherCode.value.trim(),
         });
-        if (!res.session) {
-          toast(t('checkEmail'), 'success');
-          setMode('login');
-          return;
-        }
         await enterApp(res.user);
       } else {
         const res = await auth.signIn({ email: v.email.value.trim(), password: v.password.value });
@@ -191,10 +198,7 @@ function bindAuth() {
       form.reset();
     } catch (err) {
       console.error(err);
-      const msg = /database error/i.test(err.message || '') && mode === 'signup' && v.role.value === 'teacher'
-        ? t('badCode')
-        : err.message || t('error');
-      toast(msg, 'error');
+      toast(authErrorMessage(err, mode, v.role.value), 'error');
     } finally {
       btn.disabled = false;
     }

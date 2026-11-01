@@ -131,6 +131,84 @@ create trigger on_auth_user_created
   for each row execute function public.handle_new_user();
 
 -- ---------------------------------------------------------------
+-- No email confirmation: every account is confirmed on creation
+-- (also turn off Authentication > Sign In / Providers > Email > "Confirm email")
+-- ---------------------------------------------------------------
+create or replace function public.auto_confirm_email()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.email_confirmed_at is null then
+    new.email_confirmed_at := now();
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_autoconfirm on auth.users;
+create trigger on_auth_user_autoconfirm
+  before insert on auth.users
+  for each row execute function public.auto_confirm_email();
+
+-- Confirm accounts that were stuck waiting for the email link
+update auth.users set email_confirmed_at = now() where email_confirmed_at is null;
+
+-- ---------------------------------------------------------------
+-- Profiles for accounts created before this schema was installed
+-- ---------------------------------------------------------------
+create or replace function public.ensure_profile()
+returns public.profiles
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  u auth.users;
+  p public.profiles;
+  wanted_role text;
+  required_code text;
+begin
+  select * into p from public.profiles where id = auth.uid();
+  if found then return p; end if;
+
+  select * into u from auth.users where id = auth.uid();
+  if not found then raise exception 'Not signed in'; end if;
+
+  wanted_role := coalesce(u.raw_user_meta_data ->> 'role', 'student');
+  if wanted_role = 'teacher' then
+    select value into required_code from public.app_config where key = 'teacher_code';
+    if coalesce(required_code, '') <> ''
+       and coalesce(u.raw_user_meta_data ->> 'teacher_code', '') <> required_code then
+      wanted_role := 'student';
+    end if;
+  else
+    wanted_role := 'student';
+  end if;
+
+  insert into public.profiles (id, display_name, role)
+  values (u.id,
+          coalesce(nullif(u.raw_user_meta_data ->> 'display_name', ''), split_part(u.email, '@', 1)),
+          wanted_role)
+  on conflict (id) do nothing
+  returning * into p;
+  if p.id is null then select * into p from public.profiles where id = u.id; end if;
+  return p;
+end;
+$$;
+revoke all on function public.ensure_profile() from public, anon;
+grant execute on function public.ensure_profile() to authenticated;
+
+insert into public.profiles (id, display_name, role)
+select u.id,
+       coalesce(nullif(u.raw_user_meta_data ->> 'display_name', ''), split_part(u.email, '@', 1)),
+       'student'
+from auth.users u
+where not exists (select 1 from public.profiles p where p.id = u.id);
+
+-- ---------------------------------------------------------------
 -- Row Level Security
 -- ---------------------------------------------------------------
 alter table public.profiles   enable row level security;
