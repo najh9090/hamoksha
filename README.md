@@ -33,14 +33,16 @@ supabase/schema.sql tables, RLS policies, realtime
 
 ## 2. AI key
 
-Create an API key at https://console.anthropic.com. It is used only on the server, in these environment variables:
+Create an API key at https://platform.openai.com/api-keys. It is used only on the server, in these environment variables:
 
 | Variable | Value |
 | --- | --- |
-| `ANTHROPIC_API_KEY` | your key |
+| `OPENAI_API_KEY` | your OpenAI key (`sk-...`) |
 | `SUPABASE_URL` | same URL as in `js/config.js` |
 | `SUPABASE_ANON_KEY` | same anon key as in `js/config.js` |
-| `ANTHROPIC_MODEL` | optional, defaults to `claude-sonnet-5-5` |
+| `OPENAI_MODEL` | optional, defaults to `gpt-4.1-mini` |
+
+To use Claude instead, leave `OPENAI_API_KEY` unset and set `ANTHROPIC_API_KEY` (and optionally `ANTHROPIC_MODEL`).
 
 ## 3. Run locally
 
