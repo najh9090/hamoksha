@@ -46,8 +46,9 @@ function systemPrompt(subject, lang) {
 }
 
 async function verifyUser(token) {
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_ANON_KEY;
+  // Falls back to the public values in js/config.js if the env vars are not set.
+  const url = process.env.SUPABASE_URL || 'https://vyfhrkclaoiaucvlxwta.supabase.co';
+  const key = process.env.SUPABASE_ANON_KEY || 'sb_publishable_3Fc2L59usF14DPaEYJDxRA_bWTlGeke';
   if (!url || !key || !token) return false;
   const r = await fetch(`${url}/auth/v1/user`, {
     headers: { apikey: key, Authorization: `Bearer ${token}` },
